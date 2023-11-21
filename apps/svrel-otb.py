@@ -9,7 +9,7 @@ load_dotenv(find_dotenv())
 
 # Variable Declaration
 api_key = os.environ["GOOGLE_MAPS_API_KEY"]
-file_path = os.environ["FILE"]
+file_path = os.environ["SVREL_OTB_FILE_PATH"]
 
 # Initialize Google Maps Client
 gMaps = googlemaps.Client(key=api_key)
@@ -17,10 +17,11 @@ gMaps = googlemaps.Client(key=api_key)
 # Load the workbook and get the active sheet
 wb = load_workbook(filename=file_path)	
 sheet = wb.active
+counter = 0;
 
 # Iterate over the rows and update longitude and latitude
 for row in sheet.iter_rows(min_row=2, max_col=sheet.max_column, values_only=False):
-    if(row[7].value == 0):
+    if(row[7].value == 0 and (row[5].value == None or row[6].value == None)):
         address = row[3].value + ", " + row[4].value + ", Jamaica"
         if address:
             geocode_result = gMaps.geocode(address)
@@ -29,6 +30,8 @@ for row in sheet.iter_rows(min_row=2, max_col=sheet.max_column, values_only=Fals
                 longitude = geocode_result[0]["geometry"]["location"]["lng"]
                 row[5].value = longitude
                 row[6].value = latitude
+                counter += 1
 
 # Save the workbook
 wb.save(filename=file_path)
+print("Updated " + str(counter) + " rows.")
