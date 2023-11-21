@@ -8,14 +8,27 @@ from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 
 # Variable Declaration
-apiKey = os.environ["GOOGLE_MAPS_API_KEY"]
-filePath = os.environ["FILE_PATH"]
+api_key = os.environ["GOOGLE_MAPS_API_KEY"]
+file_path = os.environ["FILE"]
 
-wb = load_workbook(filename = filePath)	
+# Initialize Google Maps Client
+gMaps = googlemaps.Client(key=api_key)
+
+# Load the workbook and get the active sheet
+wb = load_workbook(filename=file_path)	
 sheet = wb.active
 
-gMaps = googlemaps.Client(key=apiKey)
+# Iterate over the rows and update longitude and latitude
+for row in sheet.iter_rows(min_row=2, max_col=sheet.max_column, values_only=False):
+    if(row[7].value == 0):
+        address = row[3].value + ", " + row[4].value + ", Jamaica"
+        if address:
+            geocode_result = gMaps.geocode(address)
+            if geocode_result:
+                latitude = geocode_result[0]["geometry"]["location"]["lat"]
+                longitude = geocode_result[0]["geometry"]["location"]["lng"]
+                row[5].value = longitude
+                row[6].value = latitude
 
-geocodeResult = gMaps.geocode("1600 Amphitheatre Parkway, Mountain View, CA")
-
-print(geocodeResult)
+# Save the workbook
+wb.save(filename=file_path)
