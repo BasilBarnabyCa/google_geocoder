@@ -9,7 +9,8 @@ load_dotenv(find_dotenv())
 
 # Variable Declaration
 api_key = os.environ["GOOGLE_MAPS_API_KEY"]
-file_path = os.environ["SVREL_OTB_FILE_PATH"]
+# file_path = os.environ["FILE"]
+file_path = "otbs_update.xlsx"
 
 # Initialize Google Maps Client
 gMaps = googlemaps.Client(key=api_key)
